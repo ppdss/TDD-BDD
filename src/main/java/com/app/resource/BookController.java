@@ -7,11 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.app.ApiErrors;
 import com.app.dto.BookDTO;
@@ -40,6 +43,13 @@ public class BookController {
 		entity = service.save(entity);
 		
 		return modelMapper.map(entity, BookDTO.class);
+	}
+	
+	@GetMapping("{id}")
+	public BookDTO get(@PathVariable Long id) {
+		return service.getById(id)
+				.map(book ->  modelMapper.map(book, BookDTO.class))
+				.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class) // exceção lançada quando se algum campo verificado pelo @Valid não passar no teste do validator 

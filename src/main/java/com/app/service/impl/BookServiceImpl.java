@@ -1,5 +1,7 @@
 package com.app.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.app.exception.BusinessException;
@@ -22,6 +24,12 @@ public class BookServiceImpl implements BookService {
 			throw new BusinessException("Isbn já cadastrado.");
 		}
 		return repository.save(book);
+	}
+
+
+	@Override
+	public Optional<Book> getById(Long id) {
+		return Optional.empty();
 	}
 
 }
