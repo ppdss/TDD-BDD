@@ -47,7 +47,7 @@ public class BookControllerTest {
 	public void createBookTest() throws Exception {
 
 		BookDTO dto = createNewBookDTO();
-		Book savedBook = Book.builder().id(10L).author("Author").title("Meu Livro").isbn("1233212").build();
+		Book savedBook = Book.builder().id(1L).author("Pedro").title("As aventuras de wendz").isbn("321").build();
 
 		BDDMockito.given(service.save(Mockito.any(Book.class))).willReturn(savedBook); // simula o servico de salvar um book e retorna um book como se fosse da entidade
 
@@ -63,7 +63,7 @@ public class BookControllerTest {
 		.perform(request)
 		.andExpect( status().isCreated() )
 		.andExpect( jsonPath("id").isNotEmpty() )
-		.andExpect( jsonPath("id").value(10L) )
+		.andExpect( jsonPath("id").value(1L) )
 		.andExpect( jsonPath("title").value(dto.getTitle()) )
 		.andExpect( jsonPath("author").value(dto.getAuthor()) )
 		.andExpect( jsonPath("isbn").value(dto.getIsbn()) )
@@ -159,8 +159,7 @@ public class BookControllerTest {
 
 		// verificação 
 		mvc.perform(request)
-		.andExpect(status().isNotFound())
-		;
+		.andExpect(status().isNotFound());
 
 
 
@@ -201,10 +200,68 @@ public class BookControllerTest {
 			.andExpect(status().isNotFound());
 
 	}
+	
+	@Test
+	@DisplayName("Deve atualizar um livro.")
+	public void updateBookTest() throws Exception {
+		
+		// cenario (given)
+		Long id = 1L;	
+		String json = new ObjectMapper().writeValueAsString(createNewBookDTO());		
+		
+		Book updatingBook = Book.builder().id(id).author("sem author").isbn("321").title("sem titulo").build();
+		BDDMockito.given(service.getById(id) )
+				.willReturn(Optional.of(updatingBook));
+		
+		Book updatedBook = Book.builder().id(id).author("Pedro").isbn("321").title("As aventuras de wendz").build();		
+		BDDMockito.given(service.update(updatingBook)).willReturn(updatedBook);
+
+		// execução (when)
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.put(BOOK_API.concat("/"+ id))
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json);
+		
+		// verify
+		mvc.perform(request)
+			.andExpect(status().isOk())
+			.andExpect( jsonPath("id").isNotEmpty() )
+			.andExpect( jsonPath("id").value(id) )
+			.andExpect( jsonPath("title").value(createNewBookDTO().getTitle()) )
+			.andExpect( jsonPath("author").value(createNewBookDTO().getAuthor()) )
+			.andExpect( jsonPath("isbn").value(createNewBookDTO().getIsbn()) )
+
+			;
+
+	}
+	
+
+	@Test
+	@DisplayName("Deve retornar 404 quando não encontrar um livro para atualizar.")
+	public void updateInexistentBookTest() throws Exception {
+		// cenario (given)
+		String json = new ObjectMapper().writeValueAsString(createNewBookDTO());		
+		
+		BDDMockito.given(service.getById(Mockito.anyLong()) )
+				.willReturn(Optional.empty());
 
 
+		// execução (when)
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.put(BOOK_API.concat("/"+ 1))
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json);
+		
+		// verify
+		mvc.perform(request)
+			.andExpect(status().isNotFound());
+	}
+	
+	
 	public BookDTO createNewBookDTO() {
-		return BookDTO.builder().author("Author").title("Meu Livro").isbn("1233212").build();
+		return BookDTO.builder().author("Pedro").title("As aventuras de wendz").isbn("321").build();
 	}
 
 

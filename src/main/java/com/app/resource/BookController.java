@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -60,6 +61,16 @@ public class BookController {
 		service.delete(book);
 	}
 	
+	
+	@PutMapping("{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public BookDTO put(@PathVariable Long id, BookDTO dto) {
+		Book book = service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		book.setAuthor(dto.getAuthor());
+		book.setTitle(dto.getTitle());
+		book = service.update(book);
+		return modelMapper.map(book, BookDTO.class);
+	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class) // exceção lançada quando se algum campo verificado pelo @Valid não passar no teste do validator 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
