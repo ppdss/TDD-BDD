@@ -151,19 +151,55 @@ public class BookControllerTest {
 
 		// cenario (given)
 		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
-		
+
 		// execução (when)
 		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
 				.get(BOOK_API.concat("/"+ 1))
 				.contentType(MediaType.APPLICATION_JSON);
-		
+
 		// verificação 
-				mvc.perform(request)
-				.andExpect(status().isNotFound())
-				;
+		mvc.perform(request)
+		.andExpect(status().isNotFound())
+		;
+
+
+
+	}
+	@Test
+	@DisplayName("Deve deletar um livro.")
+	public void deleteBookTest() throws Exception {
+
+		// cenario (given)
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.of(Book.builder().id(1L).build()));
+
+
+		// execução (when)
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.delete(BOOK_API.concat("/"+ 1));
 		
+		// verify
+		mvc.perform(request)
+			.andExpect(status().isNoContent());
+
+	}
+
+	
+	@Test
+	@DisplayName("Deve retornar resource not found quando não encontrar um livro para deletar.")
+	public void deleteInexistentBookTest() throws Exception {
+
+		// cenario (given)
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+
+
+		// execução (when)
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.delete(BOOK_API.concat("/"+ 1));
 		
-		
+		// verify
+		mvc.perform(request)
+			.andExpect(status().isNotFound());
+
 	}
 
 
