@@ -1,4 +1,4 @@
-package com.app.dto;
+package api.dto;
 
 
 

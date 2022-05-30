@@ -1,4 +1,4 @@
-package com.app;
+package api;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
